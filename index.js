@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.send("API insurence");
+  res.status(200).json({ Message: "Insurence API" });
 });
 
 mongoose
