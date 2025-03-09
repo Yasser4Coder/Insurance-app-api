@@ -17,7 +17,7 @@ app.use(cors());
 app.get("/", (req, res) => {
   res.status(201).json({ Message: "Insurence API" });
 });
-
+//hi yasser
 mongoose
   .connect(DB_URL)
   .then(() => console.log("Database connected"))
