@@ -24,5 +24,5 @@ mongoose
   .catch((err) => console.log(err && "Database connection failed"));
 
 app.listen(PORT, () => {
-  console.log("the server is running");
+  console.log("the server is running on http://localhost:" + PORT);
 });
