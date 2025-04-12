@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import authRoutes from "./src/routes/auth.routes.js";
 
 import cors from "cors";
 
@@ -19,10 +20,12 @@ app.use(
     credentials: true,
   })
 );
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.status(201).json({ Message: "Insurence API" });
 });
+
 //hi yasser
 mongoose
   .connect(DB_URL)
