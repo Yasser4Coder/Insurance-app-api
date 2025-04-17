@@ -11,6 +11,24 @@ const addUser = async (req, res) => {
   }
 };
 
+const addExpert = async (req, res) => {
+  try {
+    const { fullName, email, password, phone, address } = req.body;
+    const expert = new User({
+      fullName,
+      email,
+      password,
+      phone,
+      address,
+      role: "expert",
+    });
+    await expert.save();
+    res.status(201).json(expert);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const removeUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -55,4 +73,4 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-export { addUser, removeUser, getUser, updateUser, getAllUsers };
+export { addUser, removeUser, getUser, updateUser, getAllUsers, addExpert };
