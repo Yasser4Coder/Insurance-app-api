@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import authRoutes from "./src/routes/auth.routes.js";
 import vehicleRoutes from "./src/routes/vehicle.routes.js";
+import policyRoutes from "./src/routes/policy.routes.js";
 
 import cors from "cors";
 
@@ -23,6 +24,7 @@ app.use(
 );
 app.use("/api/auth", authRoutes);
 app.use("/api/vehicle", vehicleRoutes);
+app.use("/api/policy", policyRoutes);
 
 app.get("/", (req, res) => {
   res.status(201).json({ Message: "Insurence API" });
