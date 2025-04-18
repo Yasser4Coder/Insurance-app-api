@@ -9,9 +9,15 @@ const PolicySchema = new mongoose.Schema({
   price: Number,
   status: {
     type: String,
-    enum: ["active", "expired", "cancelled"],
-    default: "active",
+    enum: ["pending", "active", "expired", "cancelled"],
+    default: "pending",
   },
+  paymentStatus: {
+    type: String,
+    enum: ["pending", "paid", "failed"],
+    default: "pending",
+  },
+  checkoutId: String,
 });
 
 const Policy = mongoose.model("Policy", PolicySchema);

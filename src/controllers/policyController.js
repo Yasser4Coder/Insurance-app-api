@@ -1,7 +1,9 @@
 import Policy from "../models/Policy.js";
+import User from "../models/User.js";
+import fetch from "node-fetch";
 
 const createPolicy = async (req, res) => {
-  const { type, startDate, endDate, status, user, vehicle, price } = req.body;
+  const { type, startDate, endDate, user, vehicle, price } = req.body;
 
   try {
     const existingPolicy = await Policy.findOne({
@@ -9,7 +11,6 @@ const createPolicy = async (req, res) => {
       vehicle,
       status: "active",
     });
-
     if (existingPolicy) {
       return res.status(400).json({
         error: "An active policy already exists for this user and vehicle",
@@ -20,15 +21,19 @@ const createPolicy = async (req, res) => {
       type,
       startDate,
       endDate,
-      status,
       user,
       vehicle,
       price,
+      status: "pending",
     });
 
-    res.status(201).json({ message: "Policy created successfully", policy });
+    return res.status(201).json({
+      message: "Policy created successfully. Proceed to payment.",
+      policy,
+    });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error("Error creating policy:", err);
+    return res.status(500).json({ error: "Failed to create policy." });
   }
 };
 
