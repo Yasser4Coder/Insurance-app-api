@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
+import { WebSocketServer } from "ws";
+import http from "http";
 
 import authRoutes from "./src/routes/auth.routes.js";
 import vehicleRoutes from "./src/routes/vehicle.routes.js";
@@ -9,6 +11,8 @@ import claimsRoutes from "./src/routes/claim.routes.js";
 import policyRoutes from "./src/routes/policy.routes.js";
 import pymentRoutes from "./src/routes/pyment.routes.js";
 import userRoutes from "./src/routes/user.routes.js";
+import notificationRoutes from "./src/routes/notification.routes.js";
+import { setupSocket } from "./src/config/socket.js";
 
 import cors from "cors";
 
@@ -18,7 +22,8 @@ const DB_URL = process.env.MONGODB_URL;
 
 const app = express();
 
-// app.use(express.json());
+const server = http.createServer(app);
+
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
@@ -42,6 +47,9 @@ app.use("/api/user", userRoutes);
 app.use("/api/claims", claimsRoutes);
 app.use("/api/policy", policyRoutes);
 app.use("/api/payment", pymentRoutes);
+app.use("/api/notifications", notificationRoutes);
+
+setupSocket(server);
 
 app.get("/", (req, res) => {
   res.status(201).json({ Message: "Insurence API" });
