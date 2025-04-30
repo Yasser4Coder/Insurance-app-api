@@ -11,6 +11,7 @@ import claimsRoutes from "./src/routes/claim.routes.js";
 import policyRoutes from "./src/routes/policy.routes.js";
 import pymentRoutes from "./src/routes/pyment.routes.js";
 import userRoutes from "./src/routes/user.routes.js";
+import notificationRoutes from "./src/routes/notification.routes.js";
 
 import cors from "cors";
 
@@ -45,6 +46,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/claims", claimsRoutes);
 app.use("/api/policy", policyRoutes);
 app.use("/api/payment", pymentRoutes);
+app.use("/api/notification", notificationRoutes);
 
 app.get("/", (req, res) => {
   res.status(201).json({ Message: "Insurence API" });
