@@ -12,6 +12,7 @@ import policyRoutes from "./src/routes/policy.routes.js";
 import pymentRoutes from "./src/routes/pyment.routes.js";
 import userRoutes from "./src/routes/user.routes.js";
 import notificationRoutes from "./src/routes/notification.routes.js";
+import { setupSocket } from "./src/config/socket.js";
 
 import cors from "cors";
 
@@ -39,6 +40,8 @@ app.use(
     },
   })
 );
+
+setupSocket(server);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/vehicle", vehicleRoutes);
