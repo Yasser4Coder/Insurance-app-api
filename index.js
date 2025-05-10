@@ -16,6 +16,8 @@ import { setupSocket } from "./src/config/socket.js";
 
 import cors from "cors";
 
+//i am a test
+
 dotenv.config();
 const PORT = process.env.PORT || 5000;
 const DB_URL = process.env.MONGODB_URL;
