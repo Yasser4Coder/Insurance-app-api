@@ -34,6 +34,21 @@ export const register = async (req, res) => {
   }
 };
 
+export const getUserIdByEmail = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const user = await User.findOne({ email }); // get single user
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ userId: user._id });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;

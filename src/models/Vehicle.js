@@ -7,6 +7,8 @@ const VehicleSchema = new mongoose.Schema({
   brand: String,
   year: Number,
   chassisNumber: String,
+  driveLicense: String,
+  vehicleRegistration: String,
 });
 
 const Vehicle = mongoose.model("Vehicle", VehicleSchema);

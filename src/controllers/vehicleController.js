@@ -1,9 +1,19 @@
-import Vehicle from "../models/vehicle.js";
+import Vehicle from "../models/Vehicle.js";
 
 const addVehicle = async (req, res) => {
   try {
-    const { owner, registrationNumber, model, brand, year, chassisNumber } =
-      req.body;
+    const {
+      owner,
+      registrationNumber,
+      model,
+      brand,
+      year,
+      chassisNumber,
+      driveLicense,
+      vehicleRegistration,
+    } = req.body;
+
+    // The driveLicense and vehicleRegistration will already be in Base64 format
     const vehicle = new Vehicle({
       owner,
       registrationNumber,
@@ -11,7 +21,10 @@ const addVehicle = async (req, res) => {
       brand,
       year,
       chassisNumber,
+      driveLicense,
+      vehicleRegistration,
     });
+
     await vehicle.save();
     res.status(201).json(vehicle);
   } catch (error) {
