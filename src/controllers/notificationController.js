@@ -1,4 +1,6 @@
 import { getIO } from "../config/socket.js"; // Adjust path if needed
+import Policy from "../models/Policy.js";
+import {format} from "date-fns";
 
 /**
  * Send notification to all connected users
@@ -84,7 +86,7 @@ const sendNotificationToUser = async (req, res) => {
 
     res.json({
       success: true,
-      message: `Notification sent to user ${fullName}`,
+      message: `Notification sent to user ${userId}`,
       timestamp,
     });
   } catch (err) {
@@ -93,4 +95,50 @@ const sendNotificationToUser = async (req, res) => {
   }
 };
 
-export { sendNotificationToAll, sendNotificationToUser };
+/**
+ * Automatically send notifications for expired policies
+ */
+const sendExpiredPolicyNotifications = async () => {
+  try {
+    const io = getIO();
+    if (!io) {
+      console.error("Socket.io is not initialized");
+      return;
+    }
+
+    const now = new Date();
+
+    // Find policies that expired today or earlier and are not yet notified
+    const expiredPolicies = await Policy.find({
+      expiryDate: { $lte: now },
+      notified: false, // You need this field in your Policy model
+    });
+
+    for (const policy of expiredPolicies) {
+      const { userId } = policy;
+
+      const timestamp = format(new Date(), "hh:mm a"); // Optional formatting
+
+      const userSockets = Object.values(io.sockets.sockets).filter(
+        (socket) => socket.userId === userId
+      );
+
+      if (userSockets.length > 0) {
+        userSockets.forEach((socket) => {
+          socket.emit("notification", {
+            message: `Your policy has expired. Please renew it.`,
+            timestamp,
+          });
+        });
+      }
+
+      // Mark the policy as notified to prevent duplicate notifications
+      policy.notified = true;
+      await policy.save();
+    }
+  } catch (err) {
+    console.error("Error sending expired policy notifications:", err);
+  }
+};
+
+export { sendNotificationToAll, sendNotificationToUser, sendExpiredPolicyNotifications };
