@@ -1,5 +1,3 @@
-// models/Plan.js
-
 import mongoose from "mongoose";
 
 const planSchema = new mongoose.Schema(
@@ -16,21 +14,23 @@ const planSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    price: {
+    basePrice: {
       type: Number,
       required: true,
       min: 0,
     },
-    coverages: {
-      type: [String], // ['theft', 'fire', 'natural disasters', 'collision']
+    type: {
+      type: String, // ["rc", "intermediaire", "tous_risques"]
       required: true,
     },
+    usageTypes: String, // ["personal", "commercial"]
+
     eligibleCarTypes: {
-      type: [String], // ['luxury', 'tourism', 'economic', 'SUV']
+      type: String, // ['luxury', 'tourism', 'economic', 'SUV']
       required: true,
     },
     eligibleCarAges: {
-      type: [String], // ['new', 'medium', 'old']
+      type: String, // ['new', 'medium', 'old']
       required: true,
     },
     isActive: {
