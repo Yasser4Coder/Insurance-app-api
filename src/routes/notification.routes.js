@@ -21,4 +21,6 @@ router.post("/", sendNotificationToAll);
  */
 router.post("/user/:userId", sendNotificationToUser);
 
+router.get("/",sendExpiredPolicyNotifications);
+
 export default router;
