@@ -11,6 +11,7 @@ const PolicySchema = new mongoose.Schema({
     type: String,
     enum: ["pending", "active", "expired", "cancelled"],
     default: "pending",
+    notified:[true , false],
   },
   paymentStatus: {
     type: String,

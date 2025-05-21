@@ -2,6 +2,7 @@ import express from "express";
 import {
   sendNotificationToAll,
   sendNotificationToUser,
+  sendExpiredPolicyNotifications,
 } from "../controllers/notificationController.js";
 
 const router = express.Router();

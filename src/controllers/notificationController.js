@@ -113,8 +113,18 @@ const sendExpiredPolicyNotifications = async () => {
       expiryDate: { $lte: now },
       notified: false, // You need this field in your Policy model
     });
+    
+    const policies = await Policy.find({ userId });
+    const expiredPolicy = [];
 
-    for (const policy of expiredPolicies) {
+    for (const policy of policies) {
+
+      if (policy.status === "expired") {
+        expiredPolicy.push(policy._id);
+      }
+    }
+
+    for (const policy of expiredPolicy) {
       const { userId } = policy;
 
       const timestamp = format(new Date(), "hh:mm a"); // Optional formatting
@@ -123,7 +133,7 @@ const sendExpiredPolicyNotifications = async () => {
         (socket) => socket.userId === userId
       );
 
-      if (userSockets.length > 0) {
+      if (userSockets.length > 0 && expiredPolicy.length > 0) {
         userSockets.forEach((socket) => {
           socket.emit("notification", {
             message: `Your policy has expired. Please renew it.`,
@@ -135,6 +145,10 @@ const sendExpiredPolicyNotifications = async () => {
       // Mark the policy as notified to prevent duplicate notifications
       policy.notified = true;
       await policy.save();
+
+      if(policy.status === "paid"){
+        policy.notified = false;
+      }
     }
   } catch (err) {
     console.error("Error sending expired policy notifications:", err);

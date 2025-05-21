@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import { WebSocketServer } from "ws";
 import http from "http";
-import { sendExpiredPolicyNotifications } from "./controllers/notificationController.js";
+// import { sendExpiredPolicyNotifications } from "../controllers/notificationController.js";
 
 import authRoutes from "./src/routes/auth.routes.js";
 import vehicleRoutes from "./src/routes/vehicle.routes.js";
@@ -44,7 +44,9 @@ app.use(
   })
 );
 
-setupSocket(server);
+// const server = http.Server;
+
+// setupSocket(server);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/vehicle", vehicleRoutes);
@@ -58,7 +60,7 @@ app.get("/", (req, res) => {
   res.status(201).json({ Message: "Insurence API" });
 });
 
-setInterval(sendExpiredPolicyNotifications, 1000 * 60 * 60); // Every hour
+setInterval(app.use("/" , notificationRoutes ), 1000 * 60 * 60); // Every hour
 
 //hi yasser
 mongoose
