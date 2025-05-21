@@ -56,6 +56,7 @@ app.use("/api/notification", notificationRoutes);
 app.use("/api/plans", planRoutes);
 
 // Root Route
+// This is optional, but it's a good practice to have a root route
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Insurance API" });
 });
