@@ -2,14 +2,33 @@ import Claim from "../models/Claim.js";
 
 export const addClaim = async (req, res) => {
   try {
-    const { vehicleId, policyId, userId, description, date } = req.body;
-    const claim = new Claim({
-      userId,
-      vehicleId,
-      policyId,
+    const {
+      user,
+      vehicle,
+      policy,
       description,
       date,
+      location,
+      wilaya,
+      accidentType,
+      VehicleStatus,
+      images,
+    } = req.body;
+
+    const claim = new Claim({
+      user,
+      vehicle,
+      policy,
+      description,
+      date,
+      location,
+      wilaya,
+      accidentType,
+      VehicleStatus,
+      images,
+      status: "pending",
     });
+
     await claim.save();
     res.status(201).json(claim);
   } catch (err) {

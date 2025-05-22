@@ -6,6 +6,24 @@ const ClaimSchema = new mongoose.Schema({
   policy: { type: mongoose.Schema.Types.ObjectId, ref: "Policy" },
   description: String,
   date: Date,
+  location: String,
+  wilaya: String,
+  accidentType: {
+    type: String,
+    enum: [
+      "collision",
+      "theft",
+      "fire",
+      "vandalism",
+      "natural_disaster",
+      "other",
+    ],
+  },
+  VehicleStatus: {
+    type: [String], // array of strings
+    required: true,
+  },
+  images: [String],
   status: {
     type: String,
     enum: ["pending", "in_review", "resolved", "rejected"],

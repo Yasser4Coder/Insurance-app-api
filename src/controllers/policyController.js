@@ -173,30 +173,10 @@ const getPoliciesByVehicle = async (req, res) => {
 
   try {
     const policies = await Policy.find({ vehicle });
-    const updatedPolicies = [];
-    const expiredPolicyIds = [];
 
-    for (const policy of policies) {
-      const policyData = policy.toObject();
-
-      if (policy.status === "active" && new Date(policy.endDate) < new Date()) {
-        policyData.status = "expired";
-        expiredPolicyIds.push(policy._id);
-      }
-
-      updatedPolicies.push(policyData);
-    }
-
-    if (expiredPolicyIds.length > 0) {
-      await Policy.updateMany(
-        { _id: { $in: expiredPolicyIds } },
-        { $set: { status: "expired" } }
-      );
-    }
-
-    res.status(200).json({ policies: updatedPolicies });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(200).json(policies);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 

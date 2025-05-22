@@ -25,7 +25,8 @@ export const register = async (req, res) => {
       password: hashedPassword,
       phone,
       address,
-      role: "client",
+      roles: { User: 2001 },
+      refreshToken: "",
     });
 
     res.status(201).json({ message: "User registered successfully", user });
@@ -50,53 +51,93 @@ export const getUserIdByEmail = async (req, res) => {
 };
 
 export const login = async (req, res) => {
+  const { email, pwd } = req.body;
+  if (!email || !pwd) {
+    return res
+      .status(400)
+      .json({ message: "Email and password are required." });
+  }
+
   try {
-    const { email, password } = req.body;
+    const foundUser = await User.findOne({ email: email }).exec();
+    if (!foundUser) return res.sendStatus(401); // Unauthorized
 
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
+    const match = await bcrypt.compare(pwd, foundUser.password);
+    if (match) {
+      const roles = Object.values(foundUser.roles);
+      const accessToken = jwt.sign(
+        {
+          UserInfo: {
+            email: foundUser.email,
+            roles: roles,
+          },
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "7200s" }
+      );
+
+      const refreshToken = jwt.sign(
+        { username: foundUser.username },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      // Save refresh token in DB
+      foundUser.refreshToken = refreshToken;
+      await foundUser.save();
+
+      res.cookie("jwt", refreshToken, {
+        httpOnly: true,
+        sameSite: "None",
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+      });
+
+      res.json({ accessToken });
+    } else {
+      res.sendStatus(401);
     }
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "2h",
-    });
-
-    // Assign hashed role code
-    let hashedRole;
-    switch (user.role) {
-      case "admin":
-        hashedRole = "2012";
-        break;
-      case "expert":
-        hashedRole = "1000";
-        break;
-      case "client":
-        hashedRole = "1012";
-        break;
-      default:
-        hashedRole = "0000";
-    }
-
-    res.status(200).json({
-      message: "Login successful",
-      token,
-      role: hashedRole,
-      user: {
-        fullName: user.fullName,
-      },
-    });
   } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ error: "Server error" });
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const handleRefreshToken = async (req, res) => {
+  const cookies = req.cookies;
+  if (!cookies?.jwt) return res.sendStatus(401);
+
+  const refreshToken = cookies.jwt;
+
+  try {
+    const foundUser = await User.findOne({ refreshToken }).exec();
+    if (!foundUser) return res.sendStatus(403); // Forbidden
+
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+      (err, decoded) => {
+        if (err || foundUser.email !== decoded.email) {
+          return res.sendStatus(403);
+        }
+
+        const roles = Object.values(foundUser.roles);
+        const accessToken = jwt.sign(
+          {
+            UserInfo: {
+              email: decoded.email,
+              roles: roles,
+            },
+          },
+          process.env.JWT_SECRET,
+          { expiresIn: "7200s" }
+        );
+
+        res.json({ accessToken });
+      }
+    );
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
   }
 };

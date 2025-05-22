@@ -4,13 +4,14 @@ const UserSchema = new mongoose.Schema({
   fullName: String,
   email: { type: String, unique: true },
   password: String,
-  role: {
-    type: String,
-    enum: ["client", "expert", "admin"],
-    default: "client",
+  roles: {
+    type: Map,
+    of: Number,
+    default: { User: 2001 },
   },
   phone: String,
   address: String,
+  refreshToken: String,
 });
 
 const User = mongoose.model("User", UserSchema);

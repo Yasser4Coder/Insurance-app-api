@@ -9,6 +9,7 @@ const VehicleSchema = new mongoose.Schema({
   chassisNumber: String,
   driveLicense: String,
   vehicleRegistration: String,
+  claims: { type: Number, default: 0 },
 });
 
 const Vehicle = mongoose.model("Vehicle", VehicleSchema);
