@@ -3,15 +3,15 @@ import mongoose from "mongoose";
 const PolicySchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   vehicle: { type: mongoose.Schema.Types.ObjectId, ref: "Vehicle" },
-  type: { type: String, enum: ["rc", "tous_risques"] },
-  startDate: Date,
-  endDate: Date,
+  type: { type: String },
+  startDate: String,
+  endDate: String,
   price: Number,
   status: {
     type: String,
     enum: ["pending", "active", "expired", "cancelled"],
     default: "pending",
-    notified:[true , false],
+    notified: [true, false],
   },
   paymentStatus: {
     type: String,

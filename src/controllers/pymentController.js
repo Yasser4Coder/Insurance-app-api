@@ -26,7 +26,7 @@ const payForPolicy = async (req, res) => {
 
     // create checkout
     const checkout = await client.createCheckout({
-      success_url: "https://your-website.com/success",
+      success_url: "http://localhost:5173/home",
       amount: policy.price,
       currency: "dzd",
     });
