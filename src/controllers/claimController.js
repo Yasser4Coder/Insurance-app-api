@@ -1,10 +1,11 @@
 import Claim from "../models/Claim.js";
+import Vehicle from "../models/Vehicle.js";
 
 export const addClaim = async (req, res) => {
   try {
     const {
       user,
-      vehicle,
+      vehicle, // this should be the vehicle ID
       policy,
       description,
       date,
@@ -15,6 +16,7 @@ export const addClaim = async (req, res) => {
       images,
     } = req.body;
 
+    // Create the claim document
     const claim = new Claim({
       user,
       vehicle,
@@ -29,7 +31,12 @@ export const addClaim = async (req, res) => {
       status: "pending",
     });
 
+    // Save the claim
     await claim.save();
+
+    // Find the vehicle by ID and increment claims count by 1
+    await Vehicle.findByIdAndUpdate(vehicle, { $inc: { claims: 1 } });
+
     res.status(201).json(claim);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -142,5 +149,26 @@ export const updateClaimStatus = async (req, res) => {
     res.status(200).json(claim);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+export const createAssessment = async (req, res) => {
+  const { photos, description, insurancePrice } = req.body;
+  try {
+    const updatedClaim = await Claim.findByIdAndUpdate(
+      req.params.id,
+      {
+        status: "resolved",
+        assessment: {
+          photos,
+          description,
+          insurancePrice,
+        },
+      },
+      { new: true }
+    );
+    res.json(updatedClaim);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

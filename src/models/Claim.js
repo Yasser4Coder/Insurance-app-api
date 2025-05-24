@@ -4,6 +4,7 @@ const ClaimSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   vehicle: { type: mongoose.Schema.Types.ObjectId, ref: "Vehicle" },
   policy: { type: mongoose.Schema.Types.ObjectId, ref: "Policy" },
+  expert: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   description: String,
   date: Date,
   location: String,
@@ -29,7 +30,11 @@ const ClaimSchema = new mongoose.Schema({
     enum: ["pending", "in_review", "resolved", "rejected"],
     default: "pending",
   },
-  expert: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  assessment: {
+    photos: [String],
+    description: String,
+    insurancePrice: String,
+  },
 });
 
 const Claim = mongoose.model("Claim", ClaimSchema);

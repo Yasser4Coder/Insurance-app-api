@@ -1,6 +1,6 @@
 import Policy from "../models/Policy.js";
-import User from "../models/User.js";
-import fetch from "node-fetch";
+import generatePolicyPDF from "../services/generatePolicyPdf.js";
+import path from "path";
 
 const createPolicy = async (req, res) => {
   const { type, startDate, endDate, user, vehicle, price } = req.body;
@@ -11,6 +11,7 @@ const createPolicy = async (req, res) => {
       vehicle,
       status: "active",
     });
+
     if (existingPolicy) {
       return res.status(400).json({
         error: "An active policy already exists for this user and vehicle",
@@ -27,9 +28,14 @@ const createPolicy = async (req, res) => {
       status: "pending",
     });
 
+    // Generate the PDF
+    const pdfRelativePath = await generatePolicyPDF(policy);
+    const pdfUrl = `${req.protocol}://${req.get("host")}${pdfRelativePath}`;
+
     return res.status(201).json({
       message: "Policy created successfully. Proceed to payment.",
       policy,
+      pdfUrl, // ⬅️ Send the URL to the frontend
     });
   } catch (err) {
     console.error("Error creating policy:", err);
@@ -108,13 +114,16 @@ const deletePolicy = async (req, res) => {
 
 const getAllPolicies = async (req, res) => {
   try {
-    const policies = await Policy.find();
+    // Populate user and vehicle references
+    const policies = await Policy.find().populate("user").populate("vehicle");
+
     const updatedPolicies = [];
     const expiredPolicyIds = [];
 
     for (const policy of policies) {
       const policyData = policy.toObject();
 
+      // Check for expired policies
       if (policy.status === "active" && new Date(policy.endDate) < new Date()) {
         policyData.status = "expired";
         expiredPolicyIds.push(policy._id);
@@ -123,6 +132,7 @@ const getAllPolicies = async (req, res) => {
       updatedPolicies.push(policyData);
     }
 
+    // Update expired statuses in DB
     if (expiredPolicyIds.length > 0) {
       await Policy.updateMany(
         { _id: { $in: expiredPolicyIds } },
@@ -130,6 +140,7 @@ const getAllPolicies = async (req, res) => {
       );
     }
 
+    // Return full data including populated user and vehicle
     res.status(200).json({ policies: updatedPolicies });
   } catch (err) {
     res.status(500).json({ error: err.message });

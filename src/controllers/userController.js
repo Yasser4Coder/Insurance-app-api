@@ -2,9 +2,11 @@ import User from "../models/User.js";
 
 const addUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    const user = new User({ name, email, password });
+    const { fullName, email, password, roles } = req.body;
+
+    const user = new User({ fullName, email, password, roles });
     await user.save();
+
     res.status(201).json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });

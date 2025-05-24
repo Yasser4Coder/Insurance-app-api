@@ -93,7 +93,7 @@ export const login = async (req, res) => {
         maxAge: 24 * 60 * 60 * 1000, // 1 day
       });
 
-      res.json({ accessToken });
+      res.json({ accessToken: accessToken, roles: roles });
     } else {
       res.sendStatus(401);
     }

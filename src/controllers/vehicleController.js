@@ -71,8 +71,18 @@ const updateVehicle = async (req, res) => {
 
 const getAllVehicles = async (req, res) => {
   try {
-    const vehicles = await Vehicle.find();
-    res.status(200).json(vehicles);
+    const vehicles = await Vehicle.find().populate("owner", "fullName");
+    res.status(200).json(
+      vehicles.map((vehicle) => ({
+        claims: vehicle.claims,
+        _id: vehicle._id,
+        owner: vehicle.owner,
+        registrationNumber: vehicle.registrationNumber,
+        model: vehicle.model,
+        year: vehicle.year,
+        chassisNumber: vehicle.chassisNumber,
+      }))
+    );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

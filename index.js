@@ -15,6 +15,7 @@ import userRoutes from "./src/routes/user.routes.js";
 import notificationRoutes from "./src/routes/notification.routes.js";
 import planRoutes from "./src/routes/plan.routes.js";
 import { setupSocket } from "./src/config/socket.js";
+import path from "path";
 
 import cors from "cors";
 
@@ -44,6 +45,7 @@ app.use(
     },
   })
 );
+app.use("/pdfs", express.static(path.join(__dirname, "pdfs")));
 
 // Routes
 app.use("/api/auth", authRoutes);

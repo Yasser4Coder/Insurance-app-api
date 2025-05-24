@@ -8,11 +8,13 @@ import {
   getUserClaims,
   assignExpertToClaim,
   updateClaimStatus,
+  createAssessment,
 } from "../controllers/claimController.js";
 
 const router = express.Router();
 
 router.post("/", addClaim);
+router.put("/:id/assessment", createAssessment);
 
 router.get("/", getAllClaims);
 
