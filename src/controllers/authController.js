@@ -87,9 +87,9 @@ export const login = async (req, res) => {
       await foundUser.save();
 
       res.cookie("jwt", refreshToken, {
-        httpOnly: true,
+        httpOnly: false,
         sameSite: "None",
-        secure: true,
+        secure: false,
         maxAge: 24 * 60 * 60 * 1000, // 1 day
       });
 
