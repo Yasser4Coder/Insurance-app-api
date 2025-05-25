@@ -87,10 +87,10 @@ export const login = async (req, res) => {
       await foundUser.save();
 
       res.cookie("jwt", refreshToken, {
-        httpOnly: false,
+        httpOnly: true, // Prevents access from JavaScript
         sameSite: "None",
-        secure: false,
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        secure: true, // Only send cookie over HTTPS in production
+        maxAge: 24 * 60 * 60 * 1000,
       });
 
       res.json({ accessToken: accessToken, roles: roles });
