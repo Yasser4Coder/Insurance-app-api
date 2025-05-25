@@ -3,6 +3,8 @@ import {
   sendNotificationToAll,
   sendNotificationToUser,
   sendExpiredPolicyNotifications,
+  createNotification,
+  getNotifications,
 } from "../controllers/notificationController.js";
 
 const router = express.Router();
@@ -13,6 +15,8 @@ const router = express.Router();
  * Body: { message }
  */
 router.post("/", sendNotificationToAll);
+router.post("/pdf", createNotification);
+router.get("/pdf", getNotifications);
 
 /**
  * Send notification to a specific user
@@ -21,6 +25,6 @@ router.post("/", sendNotificationToAll);
  */
 router.post("/user/:userId", sendNotificationToUser);
 
-router.get("/",sendExpiredPolicyNotifications);
+router.get("/", sendExpiredPolicyNotifications);
 
 export default router;

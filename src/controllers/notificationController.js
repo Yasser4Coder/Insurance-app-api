@@ -1,6 +1,7 @@
 import { getIO } from "../config/socket.js"; // Adjust path if needed
 import Policy from "../models/Policy.js";
-import {format} from "date-fns";
+import { format } from "date-fns";
+import Notification from "../models/Notification.js";
 
 /**
  * Send notification to all connected users
@@ -113,12 +114,11 @@ const sendExpiredPolicyNotifications = async () => {
       expiryDate: { $lte: now },
       notified: false, // You need this field in your Policy model
     });
-    
+
     const policies = await Policy.find({ userId });
     const expiredPolicy = [];
 
     for (const policy of policies) {
-
       if (policy.status === "expired") {
         expiredPolicy.push(policy._id);
       }
@@ -146,7 +146,7 @@ const sendExpiredPolicyNotifications = async () => {
       policy.notified = true;
       await policy.save();
 
-      if(policy.status === "paid"){
+      if (policy.status === "paid") {
         policy.notified = false;
       }
     }
@@ -155,4 +155,35 @@ const sendExpiredPolicyNotifications = async () => {
   }
 };
 
-export { sendNotificationToAll, sendNotificationToUser, sendExpiredPolicyNotifications };
+const createNotification = async (req, res) => {
+  try {
+    const { user, pdfUrl } = req.body;
+
+    const notification = new Notification({
+      user,
+      pdfUrl,
+    });
+    await notification.save();
+
+    res.status(201).json(notification);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getNotifications = async (req, res) => {
+  try {
+    const notifications = await Notification.find().populate("user");
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export {
+  sendNotificationToAll,
+  sendNotificationToUser,
+  sendExpiredPolicyNotifications,
+  createNotification,
+  getNotifications,
+};

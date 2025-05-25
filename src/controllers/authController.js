@@ -82,18 +82,16 @@ export const login = async (req, res) => {
         { expiresIn: "1d" }
       );
 
-      // Save refresh token in DB
+      // Save refresh token in DB (optional if you want to keep track)
       foundUser.refreshToken = refreshToken;
       await foundUser.save();
 
-      res.cookie("jwt", refreshToken, {
-        httpOnly: true, // Prevents access from JavaScript
-        sameSite: "None",
-        secure: true, // Only send cookie over HTTPS in production
-        maxAge: 24 * 60 * 60 * 1000,
+      // Just send tokens in response, no cookies
+      res.json({
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        roles: roles,
       });
-
-      res.json({ accessToken: accessToken, roles: roles });
     } else {
       res.sendStatus(401);
     }
