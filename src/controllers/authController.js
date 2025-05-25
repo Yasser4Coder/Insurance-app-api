@@ -77,7 +77,8 @@ export const login = async (req, res) => {
       );
 
       const refreshToken = jwt.sign(
-        { username: foundUser.username },
+        { email: foundUser.email },
+        // Use a different secret for refresh tokens
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: "1d" }
       );
