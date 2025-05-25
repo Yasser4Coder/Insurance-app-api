@@ -45,6 +45,8 @@ app.use(
     },
   })
 );
+const __dirname = path.resolve();
+
 app.use("/pdfs", express.static(path.join(__dirname, "pdfs")));
 
 // Routes

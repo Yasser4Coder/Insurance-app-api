@@ -1,39 +1,39 @@
-const fs = require("fs");
-const path = require("path");
-const puppeteer = require("puppeteer");
+import fs from "fs";
+import path from "path";
+import PDFDocument from "pdfkit";
 
-async function generatePolicyPDF(policy) {
-  const fileName = `policy-${policy._id}.pdf`;
-  const filePath = path.join(__dirname, "pdfs", fileName);
+const __dirname = path.resolve();
 
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
+export const generatePolicyPDF = (policy) => {
+  return new Promise((resolve, reject) => {
+    const fileName = `policy-${policy._id}.pdf`;
+    const filePath = path.join(__dirname, "pdfs", fileName);
 
-  const html = `
-    <html>
-      <body>
-        <h1>Insurance Policy</h1>
-        <p><strong>Policy ID:</strong> ${policy._id}</p>
-        <p><strong>Type:</strong> ${policy.type}</p>
-        <p><strong>User:</strong> ${policy.user}</p>
-        <p><strong>Vehicle:</strong> ${policy.vehicle}</p>
-        <p><strong>Start Date:</strong> ${new Date(
-          policy.startDate
-        ).toDateString()}</p>
-        <p><strong>End Date:</strong> ${new Date(
-          policy.endDate
-        ).toDateString()}</p>
-        <p><strong>Price:</strong> ${policy.price} DZD</p>
-        <p><strong>Status:</strong> ${policy.status}</p>
-      </body>
-    </html>
-  `;
+    const doc = new PDFDocument();
+    const stream = fs.createWriteStream(filePath);
 
-  await page.setContent(html);
-  await page.pdf({ path: filePath, format: "A4" });
-  await browser.close();
+    doc.pipe(stream);
 
-  return `/pdfs/${fileName}`; // relative path
-}
+    doc.fontSize(20).text("Insurance Policy", { align: "center" });
+    doc.moveDown();
+    doc.fontSize(12);
+    doc.text(`Policy ID: ${policy._id}`);
+    doc.text(`Type: ${policy.type}`);
+    doc.text(`User ID: ${policy.user}`);
+    doc.text(`Vehicle ID: ${policy.vehicle}`);
+    doc.text(`Start Date: ${new Date(policy.startDate).toDateString()}`);
+    doc.text(`End Date: ${new Date(policy.endDate).toDateString()}`);
+    doc.text(`Price: ${policy.price} DZD`);
+    doc.text(`Status: ${policy.status}`);
 
-module.exports = generatePolicyPDF;
+    doc.end();
+
+    stream.on("finish", () => {
+      resolve(`/pdfs/${fileName}`);
+    });
+
+    stream.on("error", (err) => {
+      reject(err);
+    });
+  });
+};

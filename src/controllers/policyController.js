@@ -1,6 +1,5 @@
 import Policy from "../models/Policy.js";
-import generatePolicyPDF from "../services/generatePolicyPdf.js";
-import path from "path";
+import { generatePolicyPDF } from "../services/generatePolicyPdf.js";
 
 const createPolicy = async (req, res) => {
   const { type, startDate, endDate, user, vehicle, price } = req.body;
@@ -28,18 +27,18 @@ const createPolicy = async (req, res) => {
       status: "pending",
     });
 
-    // Generate the PDF
+    // Generate PDF and build full URL
     const pdfRelativePath = await generatePolicyPDF(policy);
     const pdfUrl = `${req.protocol}://${req.get("host")}${pdfRelativePath}`;
 
     return res.status(201).json({
       message: "Policy created successfully. Proceed to payment.",
       policy,
-      pdfUrl, // ⬅️ Send the URL to the frontend
+      pdfUrl,
     });
   } catch (err) {
     console.error("Error creating policy:", err);
-    return res.status(500).json({ error: "Failed to create policy." });
+    res.status(500).json({ error: "Failed to create policy." });
   }
 };
 
